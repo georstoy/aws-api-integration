@@ -21,7 +21,11 @@
     "typescript": "~3.7.2"
   },
   "dependencies": {
+    "@aws-cdk/aws-apigateway": "^1.19.0",
+    "@aws-cdk/aws-lambda": "^1.19.0",
     "@aws-cdk/core": "^1.19.0",
-    "source-map-support": "^0.5.16"
+    "@types/aws-lambda": "^8.10.39",
+    "source-map-support": "^0.5.16",
+    "tslint": "^5.20.1"
   }
 }
