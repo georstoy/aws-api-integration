@@ -19,4 +19,22 @@ const wikiPageHandler: Handler = (
   callback(null, response);
 };
 
-export { wikiPageHandler };
+const defaultHandler: Handler = (
+  event: any,
+  context: Context,
+  callback: Callback
+) => {
+  const response = {
+    statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*" // Required for CORS support to work
+    },
+    body: JSON.stringify({
+      message: "Ahoy, Default handler here!"
+    })
+  };
+
+  callback(null, response);
+};
+
+export { wikiPageHandler, defaultHandler };
