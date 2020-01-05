@@ -40,15 +40,20 @@
         @aws-cdk/aws-apigateway \
         @aws-cdk/aws-lambda     \
         @types/aws-lambda       \
+        @aws-cdk/aws-logs       \
+        @aws-cdk/aws-logs-destinations \
     --save
 ```
  * **Stack definition** in `/lib/api-integration-stack.ts`
    * [AWS ApiGateway](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_apigateway.README.html)
    * 
 
-# Testing
+# Debug
  * **Basic local testing using AWS Serverless Application Model (SAM) *(development)***
     - [install AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
     - compile (synthesize) the aws-cdk app to [AWS CloudFormation](https://aws.amazon.com/cloudformation/) file with `cdk synth --no-staging > template.yml`
     - find the Lambda function declaration you need (e.g. `wikiPageHandlerFF0F0999`)
     - call the Lambda localy with `sam local invoke wikiPageHandlerFF0F0999 --no-event`
+
+# Testing
+ * [Jest](https://jestjs.io/)

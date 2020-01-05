@@ -6,11 +6,12 @@
   },
   "scripts": {
     "dev": "npm run build && npm run localstack && npm run local:deploy",
-    "build": "npm run build:TypeScript && npm run build:CloudFormation", 
+    "deploy": "npm run cdk deploy",
+    "build": "npm run build:TypeScript && npm run build:CloudFormation",
     "build:TypeScript": "tsc",
     "build:CloudFormation": "cdk synth --no-staging > api-integration.template.json",
     "localstack": "docker-compose up",
-    "local:deploy": "awslocal cloudformation create-stack --stack-name api-integration-stack --template-body file://./api-integration.template.json",
+    "local:deploy": "awslocal cloudformation create-stack --stack-name api-integration-stack --template-url file://${PWD}./api-integration.template.json",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
@@ -23,6 +24,7 @@
     "@types/jest": "^24.0.22",
     "@types/node": "10.17.5",
     "aws-cdk": "^1.19.0",
+    "http": "0.0.0",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.1.0",
@@ -32,6 +34,8 @@
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.19.0",
     "@aws-cdk/aws-lambda": "^1.19.0",
+    "@aws-cdk/aws-logs": "^1.19.0",
+    "@aws-cdk/aws-logs-destinations": "^1.19.0",
     "@aws-cdk/core": "^1.19.0",
     "@types/aws-lambda": "^8.10.39",
     "source-map-support": "^0.5.16"

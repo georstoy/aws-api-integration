@@ -1,44 +1,49 @@
 import cdk = require("@aws-cdk/core");
-import lambda = require("@aws-cdk/aws-lambda");
-import apigateway = require("@aws-cdk/aws-apigateway");
+import Lambda = require("@aws-cdk/aws-lambda");
+import ApiGateway = require("@aws-cdk/aws-apigateway");
 import path = require("path");
-import { wikiPageHandler, defaultHandler } from "../src/handler";
 
 export class ApiIntegrationStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    
+
     // Handlers
-    const get_wiki_handler = new lambda.Function(this, "wikiPageHandler", {
-      code: lambda.Code.asset(path.join(__dirname, "../src")),
+    const get_wiki_handler = new Lambda.Function(this, "wikiPageHandler", {
+      code: Lambda.Code.asset(path.join(__dirname, "../src")),
       handler: "handler.wikiPageHandler",
-      runtime: lambda.Runtime.NODEJS_8_10,
+      runtime: Lambda.Runtime.NODEJS_8_10,
       memorySize: 1024
     });
-    const get_wiki_integration = new apigateway.LambdaIntegration(
-      get_wiki_handler,
-      {
-        contentHandling: apigateway.ContentHandling.CONVERT_TO_TEXT
-      }
-    );
-
-    const default_handler = new lambda.Function(this, "defaultHandler", {
-      code: lambda.Code.asset(path.join(__dirname, "../src")),
-      handler: "handler.defaultHandler",
-      runtime: lambda.Runtime.NODEJS_8_10,
-      memorySize: 1024
-    });
-    
-    // Routing
-    const wiki_page_api = new apigateway.LambdaRestApi(
-      this,
-      "wikiPageApi",
-      {
-        handler: default_handler,
+    const get_wiki_integration = new ApiGateway.LambdaIntegration(
+      get_wiki_handler /*{
         proxy: false
-      }
+      }*/
     );
 
-    wiki_page_api.root.addMethod("GET", get_wiki_integration);
+    const default_handler = new Lambda.Function(this, "defaultHandler", {
+      code: Lambda.Code.asset(path.join(__dirname, "../src")),
+      handler: "handler.defaultHandler",
+      runtime: Lambda.Runtime.NODEJS_8_10,
+      memorySize: 1024
+    });
+
+    // API Gateway set-up
+    const wiki_page_api = new ApiGateway.LambdaRestApi(this, "wikiPageApi", {
+      handler: default_handler,
+      proxy: false
+    });
+
+    // Routing
+    wiki_page_api.root.addMethod("GET", get_wiki_integration, {
+      // Promissing place for validation middleware
+      // ? I don't see any effect from the code below
+      requestParameters: {
+        "method.request.querystring.page_tag": true,
+        "method.request.querystring.language": true
+      }
+      /* ??? 
+      requestValidator: wiki_page_requestValidator
+      */
+    });
   }
 }
