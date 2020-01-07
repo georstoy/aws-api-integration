@@ -11,7 +11,7 @@ export class ApiIntegrationStack extends cdk.Stack {
     const get_wiki_handler = new Lambda.Function(this, "wikiPageHandler", {
       code: Lambda.Code.asset(path.join(__dirname, "../src")),
       handler: "handler.wikiPageHandler",
-      runtime: Lambda.Runtime.NODEJS_8_10,
+      runtime: Lambda.Runtime.NODEJS_12_X,
       memorySize: 1024
     });
     const get_wiki_integration = new ApiGateway.LambdaIntegration(

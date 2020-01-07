@@ -5,12 +5,14 @@
     "api-integration": "bin/api-integration.js"
   },
   "scripts": {
-    "up": "npm run build && npm run deploy",
+    "up": "npm run build && npm run test:all && npm run deploy",
     "dev": "npm run build && npm run localstack && npm run local:deploy",
+    "test:all": "npm run test:wikiPage",
+    "test:wikiPage": "sam local invoke wikiPageHandlerFF0F0999 --no-event",
     "deploy": "npm run cdk deploy",
     "build": "npm run build:TypeScript && npm run build:CloudFormation",
     "build:TypeScript": "tsc",
-    "build:CloudFormation": "cdk synth --no-staging > api-integration.template.yml",
+    "build:CloudFormation": "cdk synth --no-staging > template.yml",
     "localstack": "docker-compose up",
     "local:deploy": "awslocal cloudformation create-stack --stack-name api-integration-stack --template-url file://${PWD}./api-integration.template.json",
     "watch": "tsc -w",

@@ -23,10 +23,11 @@ const wikiPageHandler: Handler = async (
       fetch(url)
         .then(res => res.json())
         .then( (body: WikiJson) => {
-          console.log(body);
           
-          let distilledtext = new WikiSection(body.parse.wikitext['*']);
+          let distilledtext = new WikiSection(body.parse.wikitext['*'], 1);
+          console.log(`[pre-destill] ${distilledtext}`);
           distilledtext.distill();
+          console.log(`[post-destill] ${distilledtext}`);
 
           const wikiPage: WikiPage = {
             title: body.parse.title,

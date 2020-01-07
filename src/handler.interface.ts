@@ -1,4 +1,5 @@
 import { Headers } from "node-fetch";
+import { throws } from "assert";
 
 export interface WikiJson {
   parse: {
@@ -22,44 +23,16 @@ export interface ApiResponse {
   headers: Object;
   body: string;
 }
-export class WikiTemplate {
-  static readonly regexp: RegExp = /\{\{([^\{]*?)\}\}/;
-  private text: string;
 
-  constructor(text: string) {
-    this.text = text;
-  }
-}
-
-export class WikiStyle {
-  static readonly regexp: RegExp = /[\']{2,4}/;
-}
-
-export class Link {
-  static readonly regexp: RegExp = /[\[]{2}(.*?)[\]]{2}/;
-  readonly text: string;
-  readonly url: string;
-
-  constructor(text: string, url: string) {
-    this.text = text;
-    this.url = url;
-  }
-
-}
-
-abstract class Reference {
-
-}
-export class ReferenceClosed extends Reference {
- static readonly regexp: RegExp = /<ref[^<](*?)>.*?<\/ref>/;
-}
-
-export class ReferenceSelfClosing extends Reference {
-  static readonly regexp: RegExp = /<ref[^<](*?)\/>/;
-}
- 
 export class WikiText {
   private body: string;
+
+  static readonly regexpWikiTemplate: RegExp = /\{\{([^\{]*?)\}\}/;
+  static readonly regexpWikiStyle: RegExp = /[\']{2,4}/;
+  static readonly regexpWikiLink: RegExp = /[\[]{2}(.*?)[\]]{2}/
+
+  static readonly regexpReferenceClosed: RegExp = /<ref([^<]*?)>.*?<\/ref>/;
+  static readonly regexpReferenceSelfClosing: RegExp = /<ref([^<]*?)\/>/;
 
   constructor(text: string) {
     this.body = text;
@@ -67,6 +40,14 @@ export class WikiText {
 
   public distill = (): void => {
 
+  }
+
+  public toString = (): string => {
+    return this.body;
+  }
+
+  public has = (regexp: RegExp): boolean => {
+    return regexp.test(this.body);
   }
 
   public remove = (regexp: RegExp): void => {
@@ -81,49 +62,128 @@ export class WikiText {
 
   // all classes that are extracted with this function
   // MUST have a group definition in their regexp
-  public extractAll = (regexp: RegExp, items: Array<any>): Array<WikiTemplate> => {
-    while (this.body.match(regexp)) {
-      items.push(this.body.match(regexp)![1]);
-      this.remove(new RegExp(this.body.match(regexp)![0]));
+  public extract = (regexp: RegExp): string => {
+    let item = this.body.match(regexp)![1];
+    this.remove(new RegExp(this.body.match(regexp)![0]));
+    return item;
+  }
+
+  public extractAll = (regexp: RegExp): Array<string> => {
+    const items: Array<string> = [];
+
+    while (this.has(regexp)) {
+      let item = this.extract(regexp);
+      items.push(item);
+
     };
     return items;
   };
 
-  
+  static extractDescription = (wikitext: WikiText, level: number): string => {
+    console.log(`extracting description`);
+    const regexpDescription = new RegExp(`^(.+?)={${level + 1}}`, "s");
+    return wikitext.extract(regexpDescription);
+  }
+
+  static extractTemplates = (wikitext: WikiText): Array<string> => {
+    console.log(`extracting templates`);
+    return wikitext.extractAll(WikiText.regexpWikiTemplate);
+  };
+
+  static removeStyling = (wikitext: WikiText): void => {
+    console.log(`removing styling`);
+    wikitext.removeAll(WikiText.regexpWikiStyle);
+  };
+
+  static extractLinks = (wikitext: WikiText): Array<string> => {
+    console.log(`extracting links`);
+    return wikitext.extractAll(WikiText.regexpWikiLink);
+  };
+
+  static extractReferences = (wikitext: WikiText): Array<string> => {
+    console.log(`extracting references`);
+    const refClosed = wikitext.extractAll(WikiText.regexpReferenceClosed);
+    const refSelfClosing = wikitext.extractAll(WikiText.regexpReferenceSelfClosing);
+    return refClosed.concat(refSelfClosing);
+  };
+
 };
 
 export class WikiSection {
   private wikitext: WikiText;
-  private templates: Array<WikiTemplate>;
-  private links: Array<Link>;
-  private references: Array<Reference>;
+  private title?: string;
+  private description: string;
+  private level: number;
+  private templates: Array<string>;
+  private links: Array<string>;
+  private references: Array<string>;
+  private sections: Array<WikiSection>;
 
-  constructor(text: string) {
+  private regexpDescription: RegExp; // text until sub-section
+
+  constructor(text: string, level: number, title?: string) {
     this.wikitext = new WikiText(text);
+    this.level = level;
+    if (title) {
+      this.title = title;
+    }
+
+    this.regexpDescription = new RegExp(`^(.+?)={${level + 1}}`, "s");
   }
 
   public distill = (): void => {
-    // split
+    if (!WikiSection.hasSubSection(this.wikitext, this.level)) {
+      this.parse(this.wikitext);
+    } else {
+      console.log(`has sub-sections`);
+      this.parse(new WikiText(WikiText.extractDescription(this.wikitext, this.level)));
 
+      console.log(`finish parsing`);
+      //this.sections = this.extractSubSections();
+
+    }
   }
 
-  public extractTemplates = (): void => {
-    this.wikitext.extractAll(WikiTemplate.regexp, this.templates);
-  };
+  private parse = (wikitext: WikiText): void => {
+    console.log('start parsing');
+    this.templates = WikiText.extractTemplates(this.wikitext);
+    WikiText.removeStyling(this.wikitext);
+    this.links = WikiText.extractLinks(wikitext);
+    this.references = WikiText.extractReferences(wikitext);
+    this.description = wikitext.toString();
+    
+  }
 
-  public removeStyles = (): void => {
-    this.wikitext.removeAll(WikiStyle.regexp);
-  };
+  // Checks
+  static hasSubSection = (wikitext: WikiText, level: number): boolean => {
+    const regexpSubSectionTitle = new RegExp(`=${level + 1}(.*?)=${level + 1}`);
+    return wikitext.has(regexpSubSectionTitle);
+  }
 
-  public extractLinks = (): void => {
-    this.wikitext.extractAll(Link.regexp, this.links);
-  };
+  // Getters / Extractors and Removers
+  
+  /*
+    static extractSubSection = (wikitext: WikiText, level: number): any => {
+      // get sub-section
+      const title = WikiText.regex
+      const section = new WikiSection(text, this.level+1, title);
+      
+      return true;
+    }
+  
+    static extractSubSections = (): Array<WikiSection> => {
+      const sections: Array<WikiSection>;
+      while (this.wikitext.toString() != '') {
+        let section = this.extractSubSection();
+        if (this.hasSubSection()) {
+          //
+        }
+      }
+      return sections;
+    }
+  */
 
-  public extractReferences = (): void => {
-    this.wikitext.extractAll(ReferenceClosed.regexp, this.references);
-    this.wikitext.extractAll(ReferenceSelfClosing.regexp, this.references);
-  };
 
 };
-  
+
 
