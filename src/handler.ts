@@ -10,6 +10,7 @@ import {
   WikiSection,
   
 } from "./handler.interface";
+import { short } from "./debug-utils";
 
 const wikiPageHandler: Handler = async (
   event: any,
@@ -25,9 +26,9 @@ const wikiPageHandler: Handler = async (
         .then( (body: WikiJson) => {
           
           let distilledtext = new WikiSection(body.parse.wikitext['*'], 1);
-          console.log(`[pre-destill] ${distilledtext}`);
+          console.log(`[pre-destill] ${short(distilledtext.toString())}`);
           distilledtext.distill();
-          console.log(`[post-destill] ${distilledtext}`);
+          console.log(`[post-destill] ${short(distilledtext.toString())}`);
 
           const wikiPage: WikiPage = {
             title: body.parse.title,
@@ -40,7 +41,7 @@ const wikiPageHandler: Handler = async (
             headers: {
               "Access-Control-Allow-Origin": "*" // Required for CORS support to work
             },
-            body: JSON.stringify(wikiPage)
+            body: wikiPage
           }
           resolve(response);
         })

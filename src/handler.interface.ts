@@ -21,7 +21,7 @@ export interface WikiPage {
 export interface ApiResponse {
   statusCode: number;
   headers: Object;
-  body: string;
+  body: WikiPage;
 }
 
 export class WikiText {
@@ -131,12 +131,19 @@ export class WikiSection {
     this.regexpDescription = new RegExp(`^(.+?)={${level + 1}}`, "s");
   }
 
+  // used only for debuging
+  public toString = (): string => {
+    return this.wikitext.toString();
+  }
+
   public distill = (): void => {
     if (!WikiSection.hasSubSection(this.wikitext, this.level)) {
       this.parse(this.wikitext);
     } else {
       console.log(`has sub-sections`);
-      this.parse(new WikiText(WikiText.extractDescription(this.wikitext, this.level)));
+      const descriptionWikiText = WikiText.extractDescription(this.wikitext, this.level)
+      console.log(`[description WikiText] ${descriptionWikiText}`);
+      //this.parse(new WikiText(descriptionWikiText));
 
       console.log(`finish parsing`);
       //this.sections = this.extractSubSections();
@@ -146,8 +153,11 @@ export class WikiSection {
 
   private parse = (wikitext: WikiText): void => {
     console.log('start parsing');
-    this.templates = WikiText.extractTemplates(this.wikitext);
-    WikiText.removeStyling(this.wikitext);
+    console.log(`[wikitext before template extraction] ${wikitext}`);
+    this.templates = WikiText.extractTemplates(wikitext);
+    console.log(`[templates] ${this.templates}`);
+    console.log(`[wikitext after template extraction] ${wikitext}`);
+    WikiText.removeStyling(wikitext);
     this.links = WikiText.extractLinks(wikitext);
     this.references = WikiText.extractReferences(wikitext);
     this.description = wikitext.toString();
