@@ -1,3 +1,5 @@
+import { Headers } from "node-fetch";
+
 export interface WikiJson {
   parse: {
     title: string;
@@ -12,9 +14,14 @@ export interface WikiPage {
   title: string;
   pageid: number;
   wikitext: string;
-  distilledtext: string;
+  distilledtext: WikiSection;
 }
 
+export interface ApiResponse {
+  statusCode: number;
+  headers: Object;
+  body: string;
+}
 export class WikiTemplate {
   static readonly regexp: RegExp = /\{\{([^\{]*?)\}\}/;
   private text: string;
@@ -58,6 +65,10 @@ export class WikiText {
     this.body = text;
   };
 
+  public distill = (): void => {
+
+  }
+
   public remove = (regexp: RegExp): void => {
     this.body.replace(regexp, "");
   };
@@ -89,6 +100,11 @@ export class WikiSection {
 
   constructor(text: string) {
     this.wikitext = new WikiText(text);
+  }
+
+  public distill = (): void => {
+    // split
+
   }
 
   public extractTemplates = (): void => {

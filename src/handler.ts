@@ -4,15 +4,17 @@ import fetch from "node-fetch";
 import { Response } from "node-fetch";
 import {
   WikiJson,
+  WikiPage,
+  ApiResponse,
   WikiText,
   WikiSection,
-  WikiPage
+  
 } from "./handler.interface";
 
 const wikiPageHandler: Handler = async (
   event: any,
   context: Context
-  ): Promise<WikiPage> => {
+  ): Promise<ApiResponse> => {
     const pageTag = event.queryStringParameters.page_tag;
     const lang = event.queryStringParameters.language;
     const url: string = `https://${lang}.wikipedia.org/w/api.php?action=parse&page=${pageTag}&prop=wikitext&format=json`;
@@ -23,13 +25,23 @@ const wikiPageHandler: Handler = async (
         .then( (body: WikiJson) => {
           console.log(body);
           
+          let distilledtext = new WikiSection(body.parse.wikitext['*']);
+          distilledtext.distill();
 
-          resolve({
+          const wikiPage: WikiPage = {
             title: body.parse.title,
             pageid: body.parse.pageid,
             wikitext: body.parse.wikitext['*'],
-            distilledtext: 'TODO'
-          });
+            distilledtext
+          };
+          const response: ApiResponse = {
+            statusCode: 200,
+            headers: {
+              "Access-Control-Allow-Origin": "*" // Required for CORS support to work
+            },
+            body: JSON.stringify(wikiPage)
+          }
+          resolve(response);
         })
         .catch(err => {
           reject(err);
