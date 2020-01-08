@@ -13,12 +13,11 @@ import { WikiText } from "./interfaces/WikiText";
 const wikiPageHandler: Handler = async (
   event: APIGatewayEvent,
   context: Context,
-): Promise<ISuccessResponse | IErrorResponse | Context> => {
+): Promise<ISuccessResponse | IErrorResponse> => {
   return new Promise((resolve, reject) => {
     let pageTag;
     let lang;
 
-    resolve(context);
     // validate that page_tag and language are passed as query parameters
     if (
       !(

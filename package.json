@@ -14,7 +14,7 @@
     "build:TypeScript": "tsc",
     "build:CloudFormation": "cdk synth --no-staging > template.yml",
     "lint": "tslint -c tslint.json --fix 'src/*.ts'",
-    "test": "jest",
+    "test": "jest --coverage",
     "cdk": "cdk"
   },
   "devDependencies": {

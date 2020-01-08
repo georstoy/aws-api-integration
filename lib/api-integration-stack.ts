@@ -15,9 +15,7 @@ export class ApiIntegrationStack extends cdk.Stack {
       memorySize: 1024
     });
     const get_wiki_integration = new ApiGateway.LambdaIntegration(
-      get_wiki_handler /*{
-        proxy: false
-      }*/
+      get_wiki_handler
     );
 
     const default_handler = new Lambda.Function(this, "defaultHandler", {
@@ -34,16 +32,6 @@ export class ApiIntegrationStack extends cdk.Stack {
     });
 
     // Routing
-    wiki_page_api.root.addMethod("GET", get_wiki_integration, {
-      // Promissing place for validation middleware
-      // ? I don't see any effect from the code below
-      requestParameters: {
-        "method.request.querystring.page_tag": true,
-        "method.request.querystring.language": true
-      }
-      /* ??? 
-      requestValidator: wiki_page_requestValidator
-      */
-    });
+    wiki_page_api.root.addMethod("GET", get_wiki_integration);
   }
 }
