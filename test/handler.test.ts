@@ -1,4 +1,7 @@
-import { APIGatewayEvent, Callback, Context, Handler } from "aws-lambda";
+'use strict';
+const test               = require('tape');
+const utils              = require('aws-lambda-test-utils')
+const mockContextCreator = utils.mockContextCreator;
 import { wikiPageHandler } from "../src/handler";
 
 test('two plus two is four', () => {

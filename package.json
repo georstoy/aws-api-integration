@@ -5,16 +5,14 @@
     "api-integration": "bin/api-integration.js"
   },
   "scripts": {
-    "up": "npm run build && npm run debug && npm run deploy",
-    "dev": "npm run build && npm run localstack && npm run local:deploy",
+    "deploy": "npm run build && npm run test && cdk deploy",
     "debug": "npm run build && npm run debug:wikiPageHandler",
     "debug:wikiPageHandler": "sam local invoke wikiPageHandlerFF0F0999 -e debug/event.json > debug/output.json",
-    "deploy": "npm run cdk deploy",
     "build": "npm run build:TypeScript && npm run build:CloudFormation && npm run lint",
     "build:TypeScript": "tsc",
     "build:CloudFormation": "cdk synth --no-staging > template.yml",
     "lint": "tslint -c tslint.json --fix 'src/*.ts'",
-    "test": "jest --coverage",
+    "test": "jest",
     "cdk": "cdk"
   },
   "devDependencies": {
