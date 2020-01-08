@@ -19,4 +19,6 @@
   - language: language identifier (en, it, etc.)
 
 # Clean up
-  `cdk destroy`
+  remove the app from CloudFormation with `cdk destroy`
+  remove CDK Toolkit from CloudFormation (through the AWS console)
+  remove the S3 bucket (through the AWS console)

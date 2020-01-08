@@ -4,7 +4,7 @@
   "scripts": {
     "init": "npm install && npm run installLambdaDeps && cdk bootstrap",
     "installLambdaDeps": "cd ./src && npm install && cd ..",
-    "deploy": "npm run build && cdk deploy --force",
+    "deploy": "npm run build && cdk deploy",
     "build": "tsc  && npm run lint",
     "lint": "tslint -c tslint.json --fix 'src/*.ts'"
   },
