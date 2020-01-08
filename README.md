@@ -14,7 +14,8 @@
  * **Installation**
     ```
         git clone https://github.com/georstoy/aws-api-integration.git && \
-        cd ./aws-api-integration && npm install 
+        cd ./aws-api-integration && npm install \
+        cd src && npm install
     ```
  * **Build** `npm run build` 
   *compiles source files (.ts) in the same directory*
@@ -29,7 +30,9 @@
     and select `prod` stage to see your app deployment URI
 
 # API Usage
- Send a GET request to 
+ Send a GET request with query parameters:
+  - page_tag: the page name
+  - language: language identifier (en, it, etc.)
 
 # How It's made
 `mkdir api-integration`
