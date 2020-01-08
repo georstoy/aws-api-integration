@@ -21,7 +21,7 @@ export class ApiIntegrationStack extends cdk.Stack {
     const default_handler = new Lambda.Function(this, "defaultHandler", {
       code: Lambda.Code.asset(path.join(__dirname, "../src")),
       handler: "handler.defaultHandler",
-      runtime: Lambda.Runtime.NODEJS_8_10,
+      runtime: Lambda.Runtime.NODEJS_12_X,
       memorySize: 1024
     });
 
