@@ -1,5 +1,5 @@
-import { Headers } from "node-fetch";
 import { throws } from "assert";
+import { short } from "./debug-utils";
 
 export interface WikiJson {
   parse: {
@@ -29,29 +29,32 @@ export class WikiText {
 
   static readonly regexpWikiTemplate: RegExp = /\{\{([^\{]*?)\}\}/;
   static readonly regexpWikiStyle: RegExp = /[\']{2,4}/;
-  static readonly regexpWikiLink: RegExp = /[\[]{2}(.*?)[\]]{2}/
+  static readonly regexpWikiLink: RegExp = /[\[]{2}(.*?)[\]]{2}/;
 
   static readonly regexpReferenceClosed: RegExp = /<ref([^<]*?)>.*?<\/ref>/;
   static readonly regexpReferenceSelfClosing: RegExp = /<ref([^<]*?)\/>/;
 
   constructor(text: string) {
     this.body = text;
-  };
-
-  public distill = (): void => {
-
   }
 
   public toString = (): string => {
     return this.body;
-  }
+  };
 
   public has = (regexp: RegExp): boolean => {
     return regexp.test(this.body);
-  }
+  };
 
-  public remove = (regexp: RegExp): void => {
-    this.body.replace(regexp, "");
+  public remove = (segment: RegExp | string): void => {
+    const body = this.body;
+    this.body = this.body.replace(segment, "");
+    throw new Error(
+      JSON.stringify({
+        before: body,
+        after: this.body
+      })
+    );
   };
 
   public removeAll = (regexp: RegExp): void => {
@@ -62,11 +65,11 @@ export class WikiText {
 
   // all classes that are extracted with this function
   // MUST have a group definition in their regexp
-  public extract = (regexp: RegExp): string => {
+  public extract = (regexp: RegExp, replaceStr? : string): string => {
     let item = this.body.match(regexp)![1];
-    this.remove(new RegExp(this.body.match(regexp)![0]));
+    this.remove(this.body.match(regexp)![0]);
     return item;
-  }
+  };
 
   public extractAll = (regexp: RegExp): Array<string> => {
     const items: Array<string> = [];
@@ -74,16 +77,15 @@ export class WikiText {
     while (this.has(regexp)) {
       let item = this.extract(regexp);
       items.push(item);
-
-    };
+    }
     return items;
   };
 
   static extractDescription = (wikitext: WikiText, level: number): string => {
     console.log(`extracting description`);
     const regexpDescription = new RegExp(`^(.+?)={${level + 1}}`, "s");
-    return wikitext.extract(regexpDescription);
-  }
+    return wikitext.extract(regexpDescription, '='.repeat(level+1));
+  };
 
   static extractTemplates = (wikitext: WikiText): Array<string> => {
     console.log(`extracting templates`);
@@ -103,11 +105,12 @@ export class WikiText {
   static extractReferences = (wikitext: WikiText): Array<string> => {
     console.log(`extracting references`);
     const refClosed = wikitext.extractAll(WikiText.regexpReferenceClosed);
-    const refSelfClosing = wikitext.extractAll(WikiText.regexpReferenceSelfClosing);
+    const refSelfClosing = wikitext.extractAll(
+      WikiText.regexpReferenceSelfClosing
+    );
     return refClosed.concat(refSelfClosing);
   };
-
-};
+}
 
 export class WikiSection {
   private wikitext: WikiText;
@@ -134,25 +137,27 @@ export class WikiSection {
   // used only for debuging
   public toString = (): string => {
     return this.wikitext.toString();
-  }
+  };
 
   public distill = (): void => {
     if (!WikiSection.hasSubSection(this.wikitext, this.level)) {
       this.parse(this.wikitext);
     } else {
       console.log(`has sub-sections`);
-      const descriptionWikiText = WikiText.extractDescription(this.wikitext, this.level)
-      console.log(`[description WikiText] ${descriptionWikiText}`);
-      //this.parse(new WikiText(descriptionWikiText));
+      const descriptionWikiText = WikiText.extractDescription(
+        this.wikitext,
+        this.level
+      );
+      console.log(`[description WikiText] ${short(descriptionWikiText)}`);
+      this.parse(new WikiText(descriptionWikiText));
 
       console.log(`finish parsing`);
       //this.sections = this.extractSubSections();
-
     }
-  }
+  };
 
   private parse = (wikitext: WikiText): void => {
-    console.log('start parsing');
+    console.log("start parsing");
     console.log(`[wikitext before template extraction] ${wikitext}`);
     this.templates = WikiText.extractTemplates(wikitext);
     console.log(`[templates] ${this.templates}`);
@@ -161,17 +166,16 @@ export class WikiSection {
     this.links = WikiText.extractLinks(wikitext);
     this.references = WikiText.extractReferences(wikitext);
     this.description = wikitext.toString();
-    
-  }
+  };
 
   // Checks
   static hasSubSection = (wikitext: WikiText, level: number): boolean => {
     const regexpSubSectionTitle = new RegExp(`=${level + 1}(.*?)=${level + 1}`);
     return wikitext.has(regexpSubSectionTitle);
-  }
+  };
 
   // Getters / Extractors and Removers
-  
+
   /*
     static extractSubSection = (wikitext: WikiText, level: number): any => {
       // get sub-section
@@ -192,8 +196,4 @@ export class WikiSection {
       return sections;
     }
   */
-
-
-};
-
-
+}
