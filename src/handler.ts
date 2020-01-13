@@ -3,12 +3,10 @@ import fs = require("fs");
 
 import { APIGatewayEvent, Callback, Context, Handler } from "aws-lambda";
 import fetch from "node-fetch";
-import { Response } from "node-fetch";
-import { short } from "./debug-utils";
+
 import { IErrorResponse, ISuccessResponse } from "./interfaces/Api.interfaces";
 import { IWikiJson } from "./interfaces/WikiApi.interfaces";
 import { WikiSection } from "./interfaces/WikiSection";
-import { WikiText } from "./interfaces/WikiText";
 
 const wikiPageHandler: Handler = async (
   event: APIGatewayEvent,

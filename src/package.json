@@ -4,7 +4,9 @@
   "description": "",
   "main": "handler.interface.js",
   "dependencies": {
+    "@types/mongoose": "^5.5.41",
     "@types/node-fetch": "^2.5.4",
+    "mongoose": "^5.8.7",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {},
