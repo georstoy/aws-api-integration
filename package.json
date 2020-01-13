@@ -5,6 +5,8 @@
     "api-integration": "bin/api-integration.js"
   },
   "scripts": {
+    "init": "npm install &&  rm package-lock.json && npm run installLambdaDeps && cdk bootstrap",
+    "installLambdaDeps": "cd ./src && rm package-lock.json && npm install && cd ..",
     "deploy": "npm run build && npm run test && cdk deploy",
     "debug": "npm run build && npm run debug:wikiPageHandler",
     "debug:wikiPageHandler": "sam local invoke wikiPageHandlerFF0F0999 -e debug/event.json > debug/output.json",
