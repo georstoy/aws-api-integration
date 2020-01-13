@@ -26,7 +26,7 @@ export class ApiIntegrationStack extends cdk.Stack {
     });
 
     // API Gateway set-up
-    const wiki_page_api = new ApiGateway.LambdaRestApi(this, "wikiPageApi", {
+    const wiki_page_api = new ApiGateway.LambdaRestApi(this, "wikiPageApiStoringResults", {
       handler: default_handler,
       proxy: false
     });
