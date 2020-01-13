@@ -1,3 +1,7 @@
+/**
+ * This class holds methods for working with wikitext tags,
+ * excluding section header tags -> check WikiSection.ts
+ */
 export class WikiText {
   public static readonly regexpWikiTemplate: RegExp = /\{\{([^\{]*?)\}\}/;
   public static readonly regexpWikiStyle: RegExp = /[\']{2,4}/;
@@ -32,6 +36,17 @@ export class WikiText {
   public static removeNewLines = (wikitext: WikiText): void => {
     // console.log(`removing new lines`);
     wikitext.removeAll(WikiText.regexpNewLines);
+  };
+
+  public static removeEmptyBrackets = (wikitext: WikiText): void => {
+    const regexpEmptyBrackets: RegExp = /\W*\(\W*\)\W*/;
+    let emptyBrackets: string;
+
+    while (wikitext.body.match(regexpEmptyBrackets)) {
+      emptyBrackets = wikitext.body.match(regexpEmptyBrackets)![0];
+      wikitext.body = wikitext.body.replace(emptyBrackets, ' ');
+    }
+
   };
 
   public static extractLinks = (wikitext: WikiText): string[] => {

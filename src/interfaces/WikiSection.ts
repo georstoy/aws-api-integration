@@ -1,5 +1,10 @@
 import { WikiText } from "./WikiText";
 
+/**
+ * This class holds methods for wikitext
+ *  - fragmentation into sections based on section headers
+ *  - parse (high level method calling low level methods from WikiText.ts)
+ */
 export interface IDistilledWikiText {
   description: string;
   title?: string;
@@ -136,6 +141,7 @@ export class WikiSection {
     this.links = WikiText.extractLinks(wikitext);
     this.references = WikiText.extractReferences(wikitext);
     WikiText.removeNewLines(wikitext);
+    WikiText.removeEmptyBrackets(wikitext);
     this.description = wikitext.toString();
   }
 
