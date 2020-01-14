@@ -15,7 +15,8 @@
     "build:CloudFormation": "cdk synth > template.yml",
     "lint": "tslint -c tslint.json --fix 'src/*.ts'",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "destroy": "cdk destroy"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.20.0",
