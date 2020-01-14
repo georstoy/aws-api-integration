@@ -6,6 +6,8 @@
   "dependencies": {
     "@types/mongoose": "^5.5.41",
     "@types/node-fetch": "^2.5.4",
+    "dotenv": "^8.2.0",
+    "mongodb": "^3.4.1",
     "mongoose": "^5.8.7",
     "node-fetch": "^2.6.0"
   },
