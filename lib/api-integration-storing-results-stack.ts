@@ -1,11 +1,12 @@
+import path = require("path");
+
 require("dotenv").config();
 import cdk = require("@aws-cdk/core");
 import Docdb = require("@aws-cdk/aws-docdb");
 import Ec2 = require("@aws-cdk/aws-ec2");
+import { IVpc } from "@aws-cdk/aws-ec2";
 import Lambda = require("@aws-cdk/aws-lambda");
 import ApiGateway = require("@aws-cdk/aws-apigateway");
-import path = require("path");
-import { IVpc } from "@aws-cdk/aws-ec2";
 
 export class ApiIntegrationStoringResultsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
