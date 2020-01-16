@@ -1,4 +1,5 @@
 {
     "aws.onDefaultRegionMissing": "add",
-    "typescript.referencesCodeLens.enabled": true
+    "typescript.referencesCodeLens.enabled": true,
+    "javascript.referencesCodeLens.enabled": true
 }
